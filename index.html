@@ -3,209 +3,216 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Kemahiran Pemulihan: Operasi Darab (Pembelajaran)</title>
+  <title>Matematik Ceria: Darab & Bahagi</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
   <style>
-    body { box-sizing: border-box; }
-    .activity-card { min-height: 400px; }
-    .number-card { transition: all .3s ease; cursor: pointer; }
-    .number-card:hover { transform: scale(1.05); }
-    .dragging { opacity: .5; transform: rotate(5deg); }
-
-    /* Drop zone */
-    .drop-zone {
-      border: 2px dashed #cbd5e1;
-      transition: all .3s ease;
-      min-width: 60px;
-      min-height: 60px;
-      display: inline-block;
-      vertical-align: middle;
-    }
-    .drop-zone.drag-over { border-color: #3b82f6; background-color: #eff6ff; }
-
-    /* Salah */
-    @keyframes shake {
-      0% { transform: translateX(0); }
-      25% { transform: translateX(-5px); }
-      50% { transform: translateX(5px); }
-      75% { transform: translateX(-5px); }
-      100% { transform: translateX(0); }
-    }
-    .shake { animation: shake 0.5s ease; }
-
-    /* Zon sudah diisi */
-    .drop-zone-filled {
-      border-style: solid;
-      border-color: #4ade80;
-      background-color: #f0fdf4;
+    /* --- UI STYLE (MASTER REFERENCE - TEMA HIJAU) --- */
+    body { 
+        font-family: 'Fredoka', sans-serif; 
+        background-color: #f0fdf4; 
+        background-image: radial-gradient(#86efac 2px, transparent 2px); 
+        background-size: 30px 30px; 
     }
     
-    /* Guli (Aktiviti 2) */
-    .guli-source {
-      width: 50px; height: 50px;
-      background-color: #0ea5e9; /* sky-500 */
-      border: 3px solid #0284c7; /* sky-600 */
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.5rem;
-      cursor: move;
+    .game-card { 
+        background: white; 
+        border: 4px solid #475569; 
+        box-shadow: 8px 8px 0px #00000020; 
+        border-radius: 1.5rem; 
+        min-height: 600px; 
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
     }
-    .bekas-guli {
-      width: 120px;
-      height: 120px;
-      padding: 8px;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 4px;
-      align-content: flex-start;
+    
+    /* Buttons */
+    .btn-3d { 
+        transition: all 0.1s; 
+        border-bottom-width: 6px; 
+        border-color: rgba(0,0,0,0.2); 
+        transform: translateY(0); 
+        cursor: pointer; 
+        display: inline-block; 
     }
-    .bekas-guli .guli {
-      width: 30px; height: 30px;
-      background-color: #0ea5e9;
-      border-radius: 50%;
-    }
+    .btn-3d:active:not(:disabled) { transform: translateY(4px); border-bottom-width: 2px; box-shadow: none; }
+    .btn-3d:disabled { opacity: 0.6; cursor: not-allowed; border-bottom-width: 6px; filter: grayscale(100%); }
 
-    /* Tatasusunan (Aktiviti 1) */
+    /* Animation */
+    .shake { animation: shake 0.4s ease-in-out; border-color: #ef4444 !important; background-color: #fee2e2 !important; }
+    @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-8px) rotate(-5deg); } 75% { transform: translateX(8px) rotate(5deg); } }
+
+    /* --- STYLE KHUSUS DARAB & BAHAGI --- */
+
+    /* Drag & Drop Generic */
+    .drop-zone { border: 3px dashed #94a3b8; background-color: #f8fafc; transition: all .3s ease; border-radius: 1rem; min-height: 60px; }
+    .drop-zone.drag-over { border-color: #3b82f6; background-color: #dbeafe; transform: scale(1.02); }
+    .drop-zone-filled { border: 3px solid #22c55e; background-color: #dcfce7; }
+    .dragging { opacity: 0.5; transform: scale(1.1) rotate(5deg); }
+    .draggable-item { cursor: grab; user-select: none; touch-action: none; }
+    .draggable-item:active { cursor: grabbing; }
+
+    /* Aktiviti 1: Tatasusunan */
     .grid-cell {
       width: 40px; height: 40px;
-      border: 1px solid #ccc;
-      background-color: #f0f0f0;
-      cursor: pointer;
-      transition: background-color 0.2s;
+      border: 2px solid #cbd5e1; background-color: #f1f5f9;
+      cursor: pointer; border-radius: 6px; transition: all 0.2s;
     }
-    .grid-cell:hover { background-color: #e0e0e0; }
-    .grid-cell.active { background-color: #60a5fa; border-color: #2563eb; }
+    .grid-cell:hover { background-color: #e2e8f0; transform: scale(1.1); }
+    .grid-cell.active { background-color: #3b82f6; border-color: #1d4ed8; box-shadow: 0 0 8px rgba(59, 130, 246, 0.5); }
+
+    /* Aktiviti 2: Guli */
+    .guli-source {
+      width: 70px; height: 70px;
+      background: radial-gradient(circle at 30% 30%, #38bdf8, #0284c7);
+      border-radius: 50%; display: flex; align-items: center; justify-content: center;
+      font-size: 2rem; cursor: grab; box-shadow: 0 4px 6px rgba(0,0,0,0.2); transition: transform 0.2s;
+    }
+    .guli-source:active { transform: scale(0.9); cursor: grabbing; }
+    .bekas-guli {
+      min-width: 100px; min-height: 100px;
+      display: flex; flex-wrap: wrap; gap: 5px; align-content: flex-start; padding: 10px;
+    }
+    .mini-guli {
+      width: 20px; height: 20px;
+      background: radial-gradient(circle at 30% 30%, #38bdf8, #0284c7);
+      border-radius: 50%; animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    @keyframes popIn { 0% { transform: scale(0); } 100% { transform: scale(1); } }
 
   </style>
 </head>
-<body class="bg-gradient-to-br from-blue-50 to-purple-50 min-h-full">
+<body class="min-h-screen text-slate-800 pb-10">
 
-  <div class="bg-yellow-100 border-b-4 border-yellow-300 p-4 shadow-sm sticky top-0 z-10">
-    <div class="max-w-6xl mx-auto flex items-center justify-between">
+  <div class="fixed top-4 left-0 right-0 z-50 px-4 pointer-events-none">
+    <div class="max-w-4xl mx-auto bg-green-400 border-4 border-green-600 rounded-full px-6 py-3 shadow-xl flex items-center justify-between pointer-events-auto transform hover:scale-[1.01] transition-transform">
       <div class="flex items-center gap-3">
-        <span class="text-2xl">📚</span>
-        <span id="info-text" class="text-lg font-semibold text-gray-800">
-          Pilih aktiviti untuk mula belajar darab!
-        </span>
+        <span class="text-3xl animate-bounce">✖️</span>
+        <span id="info-text" class="text-xl font-bold text-green-900 leading-none mt-1">Operasi Darab & Bahagi</span>
       </div>
-      <button id="speak-btn"
-              class="bg-yellow-300 hover:bg-yellow-400 text-yellow-800 font-bold py-2 px-4 rounded-full text-xl transition-colors duration-200"
-              onclick="speakInfo()">
-        🔊
-      </button>
+      <button id="speak-btn" onclick="speakInfo()" class="bg-white hover:bg-green-50 text-green-600 border-2 border-green-200 rounded-full p-2 transition-colors shadow-sm">🔊</button>
     </div>
   </div>
+  <div class="h-24"></div>
 
-  <div class="max-w-6xl mx-auto p-6">
-    <div class="bg-white rounded-xl shadow-lg p-6 mb-6 activity-card flex items-center justify-center">
-      <div id="activity-content" class="text-center w-full">
-        <div class="py-16">
-          <div class="text-6xl mb-4">❌</div>
-          <h2 class="text-3xl font-bold text-gray-800 mb-4">
-            Kemahiran Pemulihan: Operasi Darab
-          </h2>
-          <p class="text-xl text-gray-600 mb-8">
-            Jom teroka pendaraban. Pilih aktiviti di bawah.
-          </p>
-          <div class="text-4xl">👇</div>
+  <div class="max-w-6xl mx-auto p-4">
+    
+    <div class="game-card p-8 mb-8">
+        <div id="activity-content" class="w-full relative z-10">
+            <div class="py-10 text-center">
+                <div class="text-8xl mb-6 animate-pulse">➗</div>
+                <h2 class="text-5xl font-bold text-emerald-600 mb-4">Darab & Bahagi</h2>
+                <p class="text-2xl text-slate-500 mb-8 font-semibold">Konsep visual untuk pemahaman mudah.</p>
+                <div class="text-4xl animate-bounce">👇</div>
+            </div>
         </div>
-      </div>
     </div>
 
-    <div class="bg-white rounded-xl shadow-lg p-6">
-      <h3 class="text-2xl font-bold text-gray-800 mb-4 text-center">Pilih Aktiviti</h3>
-      <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4 mb-6">
-        <button onclick="loadActivity(1)"
-                class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-4 rounded-lg text-lg transition-colors duration-200">
-          1. Bina Tatasusunan
-        </button>
-        <button onclick="loadActivity(2)"
-                class="bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-4 rounded-lg text-lg transition-colors duration-200">
-          2. Bekas & Guli
-        </button>
-        <button onclick="loadActivity(3)"
-                class="bg-purple-500 hover:bg-purple-600 text-white font-bold py-3 px-4 rounded-lg text-lg transition-colors duration-200">
-          3. Penjana Sifir
-        </button>
-        <button onclick="loadActivity(4)"
-                class="bg-orange-500 hover:bg-orange-600 text-white font-bold py-3 px-4 rounded-lg text-lg transition-colors duration-200">
-          4. Tali Sifir
-        </button>
-        <button onclick="loadActivity(5)"
-                class="bg-red-500 hover:bg-red-600 text-white font-bold py-3 px-4 rounded-lg text-lg transition-colors duration-200">
-          5. Padanan Visual
-        </button>
+    <div class="bg-white/80 backdrop-blur-sm rounded-3xl shadow-lg p-6 border-2 border-white">
+      <h3 class="text-2xl font-bold text-slate-700 mb-4 text-center">🎮 Pilih Aktiviti</h3>
+      
+      <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4 mb-8">
+        <button onclick="loadActivity(1)" class="btn-3d bg-blue-500 text-white font-bold py-4 px-2 rounded-xl text-lg">🟦 Tatasusunan</button>
+        <button onclick="loadActivity(2)" class="btn-3d bg-emerald-500 text-white font-bold py-4 px-2 rounded-xl text-lg">🥎 Bekas & Guli</button>
+        <button onclick="loadActivity(3)" class="btn-3d bg-violet-500 text-white font-bold py-4 px-2 rounded-xl text-lg">⚙️ Penjana Sifir</button>
+        <button onclick="loadActivity(4)" class="btn-3d bg-orange-500 text-white font-bold py-4 px-2 rounded-xl text-lg">➰ Tali Sifir</button>
+        <button onclick="loadActivity(5)" class="btn-3d bg-rose-500 text-white font-bold py-4 px-2 rounded-xl text-lg">🧩 Padanan</button>
       </div>
 
-      <div class="flex justify-center gap-4">
-        <button onclick="clearActivity()" class="bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-6 rounded-lg text-lg transition-colors duration-200">
-          🧹 Bersih
-        </button>
-        <button onclick="nextActivity()" class="bg-indigo-500 hover:bg-indigo-600 text-white font-bold py-2 px-6 rounded-lg text-lg transition-colors duration-200">
-          ➡️ Seterusnya
-        </button>
+      <div class="flex justify-center gap-4 border-t-2 border-slate-100 pt-6">
+        <button onclick="clearActivity()" class="btn-3d bg-slate-400 text-white font-bold py-2 px-6 rounded-full text-lg">🏠 Menu</button>
+        <button onclick="nextActivity()" class="btn-3d bg-indigo-500 text-white font-bold py-2 px-8 rounded-full text-xl">Seterusnya ➡️</button>
       </div>
     </div>
   </div>
 
   <script>
+    /* --- STANDARD HELPERS --- */
     let currentActivity = 0;
     let ttsEnabled = false;
-    let currentInfo = "Pilih aktiviti untuk mula belajar darab!"; // Diubah suai
-    let draggedElement = null;
+    let currentInfo = "Selamat datang! Pilih aktiviti.";
+    let draggedElement = null; // Untuk Drag & Drop
 
-    /* ====== TTS ====== */
-    function speak(text) {
-      if (!ttsEnabled) return;
-      if (!('speechSynthesis' in window)) return;
-      window.speechSynthesis.cancel();
-      setTimeout(() => {
-        const u = new SpeechSynthesisUtterance(text);
-        u.lang = 'ms-MY';
-        u.rate = 0.9; u.pitch = 1.05;
-        const voices = window.speechSynthesis.getVoices();
-        const ms = voices.find(v => v.lang === 'ms-MY' || v.lang?.startsWith('ms'));
-        if (ms) u.voice = ms;
-        window.speechSynthesis.speak(u);
-      }, 100);
+    function triggerWin() { confetti({ particleCount: 150, spread: 80, origin: { y: 0.6 } }); }
+
+    function speak(text) { 
+        if (!ttsEnabled || !('speechSynthesis' in window)) return; 
+        window.speechSynthesis.cancel(); 
+        const u = new SpeechSynthesisUtterance(text); 
+        u.lang = 'ms-MY'; u.rate = 0.9; u.pitch = 1.1; 
+        const voices = window.speechSynthesis.getVoices(); 
+        const ms = voices.find(v => v.lang === 'ms-MY' || v.lang?.startsWith('ms')); 
+        if (ms) u.voice = ms; 
+        window.speechSynthesis.speak(u); 
     }
-    function setInfo(text) { currentInfo = text; document.getElementById('info-text').textContent = text; }
-    function speakInfo() {
-      if (!ttsEnabled) {
-        ttsEnabled = true;
-        const btn = document.getElementById('speak-btn');
-        btn.classList.add('bg-green-300', 'hover:bg-green-400');
-        btn.classList.remove('bg-yellow-300', 'hover:bg-yellow-400');
-      }
-      speak(currentInfo);
+    
+    function setInfo(text) { 
+        currentInfo = text; 
+        const infoEl = document.getElementById('info-text'); 
+        infoEl.style.opacity = 0; 
+        setTimeout(() => { infoEl.textContent = text; infoEl.style.opacity = 1; }, 200); 
+    }
+    
+    function speakInfo() { 
+        if (!ttsEnabled) { 
+            ttsEnabled = true; 
+            document.getElementById('speak-btn').classList.add('bg-green-100', 'text-green-600'); 
+        } 
+        speak(currentInfo); 
     }
 
-    /* ====== DnD helpers ====== */
-    function dragStart(e) { draggedElement = e.target; e.target.classList.add('dragging'); }
-    function dragEnd(e) { if(draggedElement) draggedElement.classList.remove('dragging'); document.querySelectorAll('.drop-zone').forEach(z=>z.classList.remove('drag-over')); }
-    function allowDrop(e) { e.preventDefault(); if (e.currentTarget.classList.contains('drop-zone')) e.currentTarget.classList.add('drag-over'); }
-    function dragLeave(e) { if (e.currentTarget.classList.contains('drop-zone')) e.currentTarget.classList.remove('drag-over'); }
+    /* --- DRAG & DROP LOGIC --- */
+    window.dragStart = function(e) { draggedElement = e.target; e.target.classList.add('dragging'); }
+    window.dragEnd = function(e) { 
+        if(draggedElement) draggedElement.classList.remove('dragging'); 
+        document.querySelectorAll('.drop-zone').forEach(z=>z.classList.remove('drag-over')); 
+    }
+    window.allowDrop = function(e) { 
+        e.preventDefault(); 
+        if (e.currentTarget.classList.contains('drop-zone')) e.currentTarget.classList.add('drag-over'); 
+    }
+    window.dragLeave = function(e) { 
+        if (e.currentTarget.classList.contains('drop-zone')) e.currentTarget.classList.remove('drag-over'); 
+    }
 
-    /* ====== Router ====== */
+    /* --- ROUTER --- */
     function loadActivity(n) {
       currentActivity = n;
       const content = document.getElementById('activity-content');
-      if (n === 1) return loadArrayActivity(content);
-      if (n === 2) return loadContainerActivity(content);
-      if (n === 3) return loadGeneratorActivity(content);
-      if (n === 4) return loadSifirBuilder(content);
-      if (n === 5) return loadMatchingActivity(content);
+      content.style.opacity = 0;
+      setTimeout(() => {
+          if (n === 1) loadArrayActivity(content);
+          if (n === 2) loadContainerActivity(content);
+          if (n === 3) loadGeneratorActivity(content);
+          if (n === 4) loadSifirBuilder(content);
+          if (n === 5) loadMatchingActivity(content);
+          content.style.opacity = 1;
+      }, 200);
     }
 
-    /* ====== Aktiviti 1: Bina Tatasusunan ====== */
+    function clearActivity() {
+        currentActivity = 0;
+        document.getElementById('activity-content').innerHTML = `<div class="py-10 text-center"><div class="text-8xl mb-6 animate-pulse">➗</div><h2 class="text-5xl font-bold text-emerald-600 mb-4">Darab & Bahagi</h2><p class="text-2xl text-slate-500 mb-8 font-semibold">Pilih aktiviti di bawah.</p></div>`;
+        setInfo("Pilih aktiviti untuk mula belajar!");
+    }
+    function nextActivity() { let next = currentActivity + 1; if (next > 5) next = 1; loadActivity(next); }
+
+
+    /* =========================================
+       LOGIK AKTIVITI (DARAB & BAHAGI)
+       ========================================= */
+
+    /* 1. Bina Tatasusunan */
     function loadArrayActivity(content) {
-      setInfo("Klik pada mana-mana petak untuk membina tatasusunan. Lihat bagaimana baris dan lajur dikira.");
+      setInfo("Klik petak untuk bina tatasusunan.");
       let rows = 6, cols = 8;
       let gridHtml = "";
       for (let r = 1; r <= rows; r++) {
-        gridHtml += `<div class="flex justify-center">`;
+        gridHtml += `<div class="flex justify-center gap-1 mb-1">`;
         for (let c = 1; c <= cols; c++) {
           gridHtml += `<div class="grid-cell" data-row="${r}" data-col="${c}" onclick="buildArray(this, ${r}, ${c})"></div>`;
         }
@@ -213,19 +220,22 @@
       }
 
       content.innerHTML = `
-        <h3 class="text-2xl font-bold text-blue-600 mb-6">1. Bina Tatasusunan</h3>
-        <div class="mb-4 text-center">
-          <div id="array-grid" class="inline-block border border-gray-400">${gridHtml}</div>
+        <h3 class="text-4xl font-bold text-blue-500 mb-6 text-center">1. Bina Tatasusunan</h3>
+        <div class="bg-blue-50 rounded-3xl p-8 border-4 border-blue-200 max-w-2xl mx-auto">
+            <div class="mb-6 text-center">
+              <div id="array-grid" class="inline-block p-4 bg-white rounded-xl border-2 border-blue-100 shadow-sm">${gridHtml}</div>
+            </div>
+            <div id="array-result" class="text-center text-2xl font-bold text-blue-700 min-h-[60px] bg-white p-4 rounded-xl border-2 border-blue-100">
+              Klik mana-mana petak untuk mula.
+            </div>
+            <div class="text-center mt-6">
+                <button onclick="loadActivity(1)" class="btn-3d bg-blue-500 text-white font-bold py-2 px-6 rounded-xl">🔄 Mula Semula</button>
+            </div>
         </div>
-        <div id="array-result" class="mt-4 p-4 bg-blue-50 rounded-lg text-xl font-semibold text-blue-800 min-h-16">
-          Klik petak untuk mula.
-        </div>
-        <button onclick="loadActivity(1)" class="mt-4 bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded">
-          Set Semula
-        </button>
       `;
     }
-    function buildArray(cell, r, c) {
+
+    window.buildArray = function(cell, r, c) {
       const cells = document.querySelectorAll('#array-grid .grid-cell');
       cells.forEach(c => c.classList.remove('active'));
       for (let i = 1; i <= r; i++) {
@@ -234,261 +244,191 @@
         }
       }
       const total = r * c;
-      const msg = `${r} baris darab ${c} lajur sama dengan ${total}.`;
-      document.getElementById('array-result').textContent = msg;
-      setInfo(msg);
-      speak(msg);
+      document.getElementById('array-result').innerHTML = `${r} Baris x ${c} Lajur = ${total}`;
+      setInfo(`${r} darab ${c} ialah ${total}.`); speak(`${r} darab ${c} ialah ${total}.`);
     }
 
-    /* ====== Aktiviti 2: Bekas & Guli ====== */
+    /* 2. Bekas & Guli */
     function loadContainerActivity(content) {
-      setInfo("Jom buat 3 kumpulan 4. Seret guli ke dalam setiap bekas sehingga penuh (4 biji).");
+      setInfo("Seret guli ke dalam bekas. Setiap bekas perlu 4 biji.");
       content.innerHTML = `
-        <h3 class="text-2xl font-bold text-green-600 mb-6">2. Bekas & Guli</h3>
-        <div class="flex flex-col md:flex-row items-center justify-around gap-6">
-          <div class="text-center">
-            <h4 class="text-lg font-semibold mb-3">Ambil Guli:</h4>
-            <div class="guli-source" draggable="true" ondragstart="dragStart(event)" ondragend="dragEnd(event)">🥎</div>
-          </div>
-          <div class="text-center">
-            <h4 class="text-lg font-semibold mb-3">Letak Dalam Bekas:</h4>
-            <div class="flex flex-wrap justify-center gap-4">
-              <div class="bekas-guli drop-zone rounded-lg" ondrop="dropOnBekas(event, 3, 4)" ondragover="allowDrop(event)" ondragleave="dragLeave(event)" data-count="0" data-target="4"></div>
-              <div class="bekas-guli drop-zone rounded-lg" ondrop="dropOnBekas(event, 3, 4)" ondragover="allowDrop(event)" ondragleave="dragLeave(event)" data-count="0" data-target="4"></div>
-              <div class="bekas-guli drop-zone rounded-lg" ondrop="dropOnBekas(event, 3, 4)" ondragover="allowDrop(event)" ondragleave="dragLeave(event)" data-count="0" data-target="4"></div>
+        <h3 class="text-4xl font-bold text-emerald-500 mb-6 text-center">2. Bekas & Guli</h3>
+        <div class="bg-emerald-50 rounded-3xl p-8 border-4 border-emerald-200">
+            <div class="flex flex-col md:flex-row items-center justify-around gap-8 mb-8">
+              <div class="text-center bg-white p-6 rounded-2xl border-2 border-emerald-100 shadow-sm">
+                <h4 class="text-lg font-bold text-slate-400 uppercase mb-4">Sumber Guli</h4>
+                <div class="guli-source mx-auto draggable-item" draggable="true" ondragstart="dragStart(event)" ondragend="dragEnd(event)">🥎</div>
+                <p class="text-xs text-slate-400 mt-2">(Seret saya!)</p>
+              </div>
+              <div class="text-center flex-grow">
+                <h4 class="text-lg font-bold text-slate-400 uppercase mb-4">Isi 4 Guli Setiap Bekas</h4>
+                <div class="flex flex-wrap justify-center gap-4">
+                  <div class="bekas-guli drop-zone rounded-2xl bg-white" ondrop="dropOnBekas(event, 3, 4)" ondragover="allowDrop(event)" ondragleave="dragLeave(event)" data-count="0" data-target="4"></div>
+                  <div class="bekas-guli drop-zone rounded-2xl bg-white" ondrop="dropOnBekas(event, 3, 4)" ondragover="allowDrop(event)" ondragleave="dragLeave(event)" data-count="0" data-target="4"></div>
+                  <div class="bekas-guli drop-zone rounded-2xl bg-white" ondrop="dropOnBekas(event, 3, 4)" ondragover="allowDrop(event)" ondragleave="dragLeave(event)" data-count="0" data-target="4"></div>
+                </div>
+              </div>
             </div>
-          </div>
-        </div>
-        <div id="bekas-result" class="mt-6 p-4 bg-green-50 rounded-lg text-xl font-semibold text-green-800 min-h-16">
-          3 bekas disediakan. Setiap satu perlukan 4 guli.
+            <div id="bekas-result" class="text-center text-xl font-bold text-emerald-700 bg-white p-4 rounded-xl border-2 border-emerald-100">
+              Ada 3 bekas. Kita nak isi 4 guli dalam setiap satu.
+            </div>
         </div>
       `;
     }
-    function dropOnBekas(e, totalBekas, targetPerBekas) {
+
+    window.dropOnBekas = function(e, totalBekas, targetPerBekas) {
       e.preventDefault(); e.currentTarget.classList.remove('drag-over'); if (!draggedElement) return;
       let count = parseInt(e.currentTarget.dataset.count);
       const target = parseInt(e.currentTarget.dataset.target);
+      
       if (count < target) {
         count++;
         e.currentTarget.dataset.count = count;
-        e.currentTarget.innerHTML += '<div class="guli"></div>';
-        const msg = `Satu guli ditambah. Bekas ini ada ${count} guli.`;
-        setInfo(msg); speak(msg);
+        e.currentTarget.innerHTML += '<div class="mini-guli"></div>';
         if (count === target) {
-          e.currentTarget.classList.add('drop-zone-filled');
-          e.currentTarget.classList.remove('drop-zone');
-          const msgPenuh = `Bagus! Bekas ini penuh dengan ${target} guli.`;
-          setInfo(msgPenuh); speak(msgPenuh);
-        }
-        // Semak jika semua dah penuh
+          e.currentTarget.classList.add('drop-zone-filled'); e.currentTarget.classList.remove('drop-zone');
+          speak("Penuh!");
+        } else { speak(count.toString()); }
+
         const allBekas = document.querySelectorAll('.bekas-guli');
         let filledBekas = 0;
-        allBekas.forEach(b => {
-          if (parseInt(b.dataset.count) === target) filledBekas++;
-        });
+        allBekas.forEach(b => { if (parseInt(b.dataset.count) === target) filledBekas++; });
+        
         if (filledBekas === totalBekas) {
           const totalGuli = totalBekas * targetPerBekas;
-          const msgSiap = `Syabas! ${totalBekas} bekas dengan ${targetPerBekas} guli setiap satu. Semuanya ${totalGuli} guli!`;
+          const msgSiap = `Tahniah! ${totalBekas} bekas x ${targetPerBekas} guli = ${totalGuli} guli semuanya!`;
           document.getElementById('bekas-result').textContent = msgSiap;
-          setInfo(msgSiap); speak(msgSiap);
+          setInfo(msgSiap); speak(msgSiap); triggerWin();
         }
       } else {
-        const msg = "Bekas ini sudah penuh.";
-        setInfo(msg); speak(msg);
-        e.currentTarget.classList.add('shake');
-        setTimeout(()=>e.currentTarget.classList.remove('shake'), 500);
+        setInfo("Bekas ini dah penuh!"); speak("Penuh!");
+        e.currentTarget.classList.add('shake'); setTimeout(()=>e.currentTarget.classList.remove('shake'), 500);
       }
     }
 
-    /* ====== Aktiviti 3: Penjana Sifir ====== */
+    /* 3. Penjana Sifir */
     function loadGeneratorActivity(content) {
-      setInfo("Pilih bilangan kumpulan dan bilangan ahli. Tekan 'Jana Visual' untuk lihat hasilnya.");
+      setInfo("Pilih nombor dan tekan Jana.");
       content.innerHTML = `
-        <h3 class="text-2xl font-bold text-purple-600 mb-6">3. Penjana Sifir</h3>
-        <div class="flex flex-wrap justify-center items-center gap-4 mb-6">
-          <label class="font-semibold">Bilangan Kumpulan:</label>
-          <select id="select-kumpulan" class="p-2 border rounded-lg">
-            <option value="2">2</option>
-            <option value="3">3</option>
-            <option value="4">4</option>
-            <option value="5">5</option>
-          </select>
-          <label class="font-semibold">Bilangan Ahli (setiap kumpulan):</label>
-          <select id="select-ahli" class="p-2 border rounded-lg">
-            <option value="2">2</option>
-            <option value="3">3</option>
-            <option value="4">4</option>
-            <option value="5">5</option>
-          </select>
-          <button onclick="janaSifir()" class="bg-purple-500 hover:bg-purple-600 text-white font-bold py-2 px-4 rounded-lg">
-            Jana Visual
-          </button>
-        </div>
-        <div id="visual-result" class="mt-4 p-4 bg-purple-50 rounded-lg min-h-32 text-center">
-          <p class="text-gray-500">Visual akan muncul di sini.</p>
+        <h3 class="text-4xl font-bold text-violet-500 mb-6 text-center">3. Penjana Sifir</h3>
+        <div class="bg-violet-50 rounded-3xl p-8 border-4 border-violet-200 max-w-2xl mx-auto text-center">
+            <div class="flex flex-wrap justify-center items-end gap-4 mb-8">
+              <div class="text-left"><label class="block font-bold text-violet-700 text-sm mb-1">Kumpulan</label>
+                  <select id="select-kumpulan" class="p-3 border-2 border-violet-300 rounded-xl text-2xl font-bold text-violet-600 bg-white outline-none"><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option></select></div>
+              <div class="text-4xl font-black text-violet-300 pb-2">×</div>
+              <div class="text-left"><label class="block font-bold text-violet-700 text-sm mb-1">Ahli</label>
+                  <select id="select-ahli" class="p-3 border-2 border-violet-300 rounded-xl text-2xl font-bold text-violet-600 bg-white outline-none"><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option></select></div>
+              <button onclick="janaSifir()" class="btn-3d bg-violet-500 text-white font-bold py-3 px-6 rounded-xl text-lg ml-2">🚀 Jana</button>
+            </div>
+            <div id="visual-result" class="p-6 bg-white rounded-2xl min-h-[150px] border-2 border-violet-100">
+              <p class="text-slate-400 font-bold">Visual akan muncul di sini.</p>
+            </div>
         </div>
       `;
     }
-    function janaSifir() {
+
+    window.janaSifir = function() {
       const k = parseInt(document.getElementById('select-kumpulan').value);
       const a = parseInt(document.getElementById('select-ahli').value);
-      const resultEl = document.getElementById('visual-result');
-      resultEl.innerHTML = ''; // Kosongkan
-      
-      let visualHtml = `<div class="flex flex-wrap justify-center gap-3">`;
+      let visualHtml = `<div class="flex flex-wrap justify-center gap-4">`;
       for (let i = 0; i < k; i++) {
-        visualHtml += `<div class="border-2 border-purple-300 bg-white rounded-lg p-2 min-w-16">`;
-        for (let j = 0; j < a; j++) {
-          visualHtml += `<span class="text-2xl">⭐</span>`;
-        }
+        visualHtml += `<div class="border-2 border-violet-200 bg-violet-50 rounded-xl p-3 min-w-[80px] shadow-sm animate-[popIn_0.5s_ease]">`;
+        for (let j = 0; j < a; j++) visualHtml += `<span class="text-3xl inline-block">⭐</span>`;
         visualHtml += `</div>`;
       }
       visualHtml += `</div>`;
-      
       const total = k * a;
-      const msg = `${k} kumpulan darab ${a} ahli sama dengan ${total}.`;
-      resultEl.innerHTML = `
-        <h4 class="text-xl font-bold text-purple-800 mb-4">${msg}</h4>
-        ${visualHtml}
-      `;
-      setInfo(msg); speak(msg);
+      const msg = `${k} kumpulan × ${a} ahli = ${total}`;
+      document.getElementById('visual-result').innerHTML = `<h4 class="text-3xl font-black text-violet-600 mb-6">${msg}</h4>${visualHtml}`;
+      setInfo(`Lihat! ${msg}.`); speak(msg); triggerWin();
     }
 
-    /* ====== Aktiviti 4: Tali Sifir (Penambahan Berulang) ====== */
+    /* 4. Tali Sifir */
     function loadSifirBuilder(content) {
-      setInfo("Jom bina sifir 3. Tekan butang '+ Tambah 3 lagi' untuk lihat penambahan berulang.");
+      setInfo("Tekan butang Tambah untuk lihat gandaan sifir 3.");
       content.innerHTML = `
-        <h3 class="text-2xl font-bold text-orange-600 mb-6">4. Tali Sifir (Sifir 3)</h3>
-        <div class="text-center mb-6">
-          <button onclick="addSifir(3)" class="bg-orange-500 hover:bg-orange-600 text-white font-bold py-3 px-6 rounded-lg text-xl">
-            + Tambah 3 lagi 👚
-          </button>
+        <h3 class="text-4xl font-bold text-orange-500 mb-6 text-center">4. Tali Sifir (Sifir 3)</h3>
+        <div class="bg-orange-50 rounded-3xl p-8 border-4 border-orange-200 max-w-3xl mx-auto">
+            <div class="text-center mb-8">
+              <button onclick="addSifir(3)" class="btn-3d bg-orange-500 text-white font-bold py-4 px-8 rounded-2xl text-2xl shadow-lg">+ Tambah 3 👕</button>
+            </div>
+            <div id="tali-sifir-line" class="flex flex-wrap justify-start gap-2 p-6 bg-white rounded-2xl min-h-[120px] border-2 border-orange-100 shadow-inner"></div>
+            <div class="mt-6 text-center">
+               <div class="inline-block bg-orange-100 text-orange-800 px-6 py-3 rounded-xl text-3xl font-black border-2 border-orange-300">Jumlah: <span id="sifir-total">0</span></div>
+            </div>
+            <div class="text-center mt-4"><button onclick="loadSifirBuilder(document.getElementById('activity-content'))" class="text-slate-400 font-bold text-sm hover:text-orange-500 underline">Mula Semula</button></div>
         </div>
-        <div id="tali-sifir-line" class="flex flex-wrap justify-center gap-1 p-4 bg-orange-50 rounded-lg min-h-24 border-2 border-orange-200">
-          </div>
-        <h4 class="text-center text-3xl font-bold text-orange-800 mt-4">
-          Jumlah: <span id="sifir-total">0</span>
-        </h4>
       `;
     }
-    function addSifir(num) {
+
+    window.addSifir = function(num) {
       const tali = document.getElementById('tali-sifir-line');
       const totalEl = document.getElementById('sifir-total');
       const currentTotal = parseInt(totalEl.textContent);
+      if (currentTotal >= 30) { setInfo("Dah sampai 30! Tahniah."); speak("Dah sampai 30."); triggerWin(); return; }
       
-      if (currentTotal >= 30) { // Had
-        const msg = "Hebat! Anda sudah sampai 30. Tekan 'Set Semula' untuk mula balik.";
-        setInfo(msg); speak(msg);
-        loadSifirBuilder(document.getElementById('activity-content')); // Reset
-        return;
-      }
+      let groupHtml = `<div class="bg-orange-100 border border-orange-300 rounded-lg px-2 py-1 animate-[popIn_0.3s_ease] flex items-center">`;
+      for (let i = 0; i < num; i++) groupHtml += `<span class="text-3xl">👕</span>`;
+      groupHtml += `<span class="ml-1 text-xs font-bold text-orange-400">${currentTotal + num}</span></div>`;
       
-      for (let i = 0; i < num; i++) {
-        tali.innerHTML += `<span class="text-3xl">👚</span>`;
-      }
+      tali.innerHTML += groupHtml;
       const newTotal = currentTotal + num;
       totalEl.textContent = newTotal;
-      const msg = `Bagus! ${currentTotal} tambah ${num} jadi ${newTotal}.`;
-      setInfo(msg); speak(msg);
+      setInfo(`${currentTotal} tambah ${num} jadi ${newTotal}.`); speak(newTotal.toString());
     }
 
-    /* ====== Aktiviti 5: Padanan Visual ====== */
+    /* 5. Padanan Visual */
     function loadMatchingActivity(content) {
-      setInfo("Seret ayat matematik di sebelah kiri ke gambar yang betul di sebelah kanan.");
+      setInfo("Seret kad nombor ke gambar yang betul.");
       const items = [
         { eq: "2 x 4", visual: "⚽⚽⚽⚽<br>⚽⚽⚽⚽", count: 8 },
-        { eq: "3 x 2", visual: "⭐<br>⭐<br>⭐", count: 6 }, // Visual salah, betulkan
+        { eq: "3 x 2", visual: "⭐⭐<br>⭐⭐<br>⭐⭐", count: 6 },
         { eq: "4 x 1", visual: "🚀<br>🚀<br>🚀<br>🚀", count: 4 }
       ];
-      // Betulkan visual
-      items[1].visual = "⭐⭐<br>⭐⭐<br>⭐⭐";
-      
-      const shuffledItems = [...items].sort(() => Math.random() - 0.5);
       
       content.innerHTML = `
-        <h3 class="text-2xl font-bold text-red-600 mb-6">5. Padanan Visual</h3>
-        <div class="flex flex-col md:flex-row justify-around gap-6">
-          <div class="w-full md:w-1/3">
-            <h4 class="text-lg font-semibold mb-3 text-center">Ayat Matematik (Seret):</h4>
+        <h3 class="text-4xl font-bold text-rose-500 mb-6 text-center">5. Padanan Visual</h3>
+        <div class="flex flex-col md:flex-row gap-8 justify-center max-w-4xl mx-auto">
+          <div class="md:w-1/3 bg-white p-6 rounded-3xl border-4 border-rose-100 shadow-sm">
+            <h4 class="text-center font-bold text-slate-400 mb-4 uppercase tracking-wider">Ayat Matematik</h4>
             <div id="match-source" class="flex flex-col gap-4">
               ${items.sort(()=>Math.random()-0.5).map(item => `
-                <div class="number-card bg-red-100 border-2 border-red-300 rounded-lg p-4 text-2xl font-bold text-red-800 text-center cursor-move"
-                     draggable="true" ondragstart="dragStart(event)" ondragend="dragEnd(event)" data-answer="${item.eq}">
-                  ${item.eq}
-                </div>
-              `).join('')}
+                <div class="btn-3d bg-rose-500 text-white border-rose-700 rounded-xl p-4 text-2xl font-bold text-center draggable-item"
+                     draggable="true" ondragstart="dragStart(event)" ondragend="dragEnd(event)" data-answer="${item.eq}">${item.eq}</div>`).join('')}
             </div>
           </div>
-          
-          <div class="w-full md:w-2/3">
-            <h4 class="text-lg font-semibold mb-3 text-center">Gambar (Letak di sini):</h4>
+          <div class="md:w-2/3 bg-rose-50 p-6 rounded-3xl border-4 border-rose-200">
+            <h4 class="text-center font-bold text-slate-400 mb-4 uppercase tracking-wider">Padankan Gambar</h4>
             <div id="match-target" class="flex flex-col gap-4">
-              ${shuffledItems.map(item => `
-                <div class="drop-zone rounded-lg p-4 text-2xl font-bold text-center flex items-center gap-4 bg-gray-50"
+              ${items.sort(()=>Math.random()-0.5).map(item => `
+                <div class="drop-zone rounded-2xl p-4 bg-white flex items-center justify-between"
                      ondrop="dropOnMatch(event)" ondragover="allowDrop(event)" ondragleave="dragLeave(event)" data-correct="${item.eq}">
-                  <div class="w-1/2 text-center text-3xl leading-tight">${item.visual}</div>
-                  <div class="w-1/2 text-gray-400">__ = ${item.count}</div>
-                </div>
-              `).join('')}
+                  <div class="text-2xl leading-none text-center w-1/2">${item.visual}</div>
+                  <div class="text-3xl font-black text-slate-200 w-1/2 text-center">?</div>
+                </div>`).join('')}
             </div>
           </div>
         </div>
       `;
     }
-    function dropOnMatch(e) {
+
+    window.dropOnMatch = function(e) {
       e.preventDefault(); e.currentTarget.classList.remove('drag-over'); if (!draggedElement) return;
-      
       const draggedAnswer = draggedElement.dataset.answer;
       const correctNumber = e.currentTarget.dataset.correct;
       
       if (draggedAnswer === correctNumber) {
-        e.currentTarget.innerHTML = `<h3 class="text-green-600">${draggedAnswer} = ${draggedAnswer.split('x').reduce((a,b) => a*b)}</h3>`;
-        e.currentTarget.classList.add('drop-zone-filled');
-        e.currentTarget.classList.remove('drop-zone');
-        e.currentTarget.removeAttribute('ondrop');
-        draggedElement.remove(); draggedElement = null;
-        
-        const msg = `Betul! ${draggedAnswer} padan dengan gambar itu.`;
-        setInfo(msg); speak(msg);
-        
-        if (document.querySelectorAll('#match-source .number-card').length === 0) {
-          setInfo("Syabas! Semua berjaya dipadankan!"); speak("Syabas! Semua berjaya dipadankan!");
-        }
+        const total = draggedAnswer.split('x').reduce((a,b) => parseInt(a)*parseInt(b));
+        e.currentTarget.innerHTML = `<div class="text-green-600 text-2xl font-bold flex-grow text-center">Betul! <br> ${draggedAnswer} = ${total}</div><div class="text-4xl">✅</div>`;
+        e.currentTarget.classList.add('drop-zone-filled'); e.currentTarget.classList.remove('drop-zone');
+        draggedElement.remove(); draggedElement = null; speak("Betul!");
+        if (document.querySelectorAll('#match-source .draggable-item').length === 0) { setInfo("Syabas! Semua betul!"); speak("Syabas! Semua betul!"); triggerWin(); }
       } else {
-        const msg = `Bukan yang itu. Cuba padanan lain.`;
-        setInfo(msg); speak(msg);
-        e.currentTarget.classList.add('shake');
-        setTimeout(()=>e.currentTarget.classList.remove('shake'), 500);
+        setInfo("Salah tu. Cuba lagi."); speak("Cuba lagi.");
+        e.currentTarget.classList.add('shake'); setTimeout(()=>e.currentTarget.classList.remove('shake'), 500);
       }
     }
 
-
-    /* ====== Kawalan Umum ====== */
-    function clearActivity() {
-      currentActivity = 0;
-      // KANDUNGAN DEFAULT DIUBAH SUAI
-      document.getElementById('activity-content').innerHTML = `
-        <div class="text-center py-16">
-          <div class="text-6xl mb-4">❌</div>
-          <h2 class="text-3xl font-bold text-gray-800 mb-4">Kemahiran Pemulihan: Operasi Darab</h2>
-          <p class="text-xl text-gray-600 mb-8">Jom teroka pendaraban. Pilih aktiviti di bawah.</p>
-          <div class="text-4xl">👇</div>
-        </div>
-      `;
-      setInfo("Pilih aktiviti untuk mula belajar darab!");
-    }
-    
-    function nextActivity() {
-      if (currentActivity === 0) return loadActivity(1);
-      // Logik 5 aktiviti dikekalkan
-      if (currentActivity < 5) return loadActivity(currentActivity + 1);
-      return loadActivity(1);
-    }
-
-    // Kekalkan TTS resume pada sesetengah pelayar
-    if ('speechSynthesis' in window) {
-      setInterval(() => { if (window.speechSynthesis.paused) window.speechSynthesis.resume(); }, 1000);
-    }
   </script>
 </body>
 </html>
