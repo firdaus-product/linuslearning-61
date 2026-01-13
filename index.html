@@ -1,8 +1,9 @@
 <!DOCTYPE html>
-<html lang="ms-MY">
+<html lang="ms-MY" class="overflow-hidden overscroll-none">
+
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>Matematik Ceria: Darab & Bahagi</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&display=swap" rel="stylesheet">
@@ -10,122 +11,229 @@
 
   <style>
     /* --- UI STYLE (MASTER REFERENCE - TEMA HIJAU) --- */
-    body { 
-        font-family: 'Fredoka', sans-serif; 
-        background-color: #f0fdf4; 
-        background-image: radial-gradient(#86efac 2px, transparent 2px); 
-        background-size: 30px 30px; 
+    body {
+      font-family: 'Fredoka', sans-serif;
+      background-color: #f0fdf4;
+      background-image: radial-gradient(#86efac 2px, transparent 2px);
+      background-size: 30px 30px;
     }
-    
-    .game-card { 
-        background: white; 
-        border: 4px solid #475569; 
-        box-shadow: 8px 8px 0px #00000020; 
-        border-radius: 1.5rem; 
-        min-height: 600px; 
-        position: relative;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        flex-direction: column;
+
+    .game-card {
+      background: white;
+      border: 4px solid #475569;
+      box-shadow: 8px 8px 0px #00000020;
+      border-radius: 1.5rem;
+      /* min-height: 600px; REMOVED */
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      flex: 1;
+      overflow: hidden;
     }
-    
+
     /* Buttons */
-    .btn-3d { 
-        transition: all 0.1s; 
-        border-bottom-width: 6px; 
-        border-color: rgba(0,0,0,0.2); 
-        transform: translateY(0); 
-        cursor: pointer; 
-        display: inline-block; 
+    .btn-3d {
+      transition: all 0.1s;
+      border-bottom-width: 6px;
+      border-color: rgba(0, 0, 0, 0.2);
+      transform: translateY(0);
+      cursor: pointer;
+      display: inline-block;
     }
-    .btn-3d:active:not(:disabled) { transform: translateY(4px); border-bottom-width: 2px; box-shadow: none; }
-    .btn-3d:disabled { opacity: 0.6; cursor: not-allowed; border-bottom-width: 6px; filter: grayscale(100%); }
+
+    .btn-3d:active:not(:disabled) {
+      transform: translateY(4px);
+      border-bottom-width: 2px;
+      box-shadow: none;
+    }
+
+    .btn-3d:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      border-bottom-width: 6px;
+      filter: grayscale(100%);
+    }
 
     /* Animation */
-    .shake { animation: shake 0.4s ease-in-out; border-color: #ef4444 !important; background-color: #fee2e2 !important; }
-    @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-8px) rotate(-5deg); } 75% { transform: translateX(8px) rotate(5deg); } }
+    .shake {
+      animation: shake 0.4s ease-in-out;
+      border-color: #ef4444 !important;
+      background-color: #fee2e2 !important;
+    }
+
+    @keyframes shake {
+
+      0%,
+      100% {
+        transform: translateX(0);
+      }
+
+      25% {
+        transform: translateX(-8px) rotate(-5deg);
+      }
+
+      75% {
+        transform: translateX(8px) rotate(5deg);
+      }
+    }
 
     /* --- STYLE KHUSUS DARAB & BAHAGI --- */
 
     /* Drag & Drop Generic */
-    .drop-zone { border: 3px dashed #94a3b8; background-color: #f8fafc; transition: all .3s ease; border-radius: 1rem; min-height: 60px; }
-    .drop-zone.drag-over { border-color: #3b82f6; background-color: #dbeafe; transform: scale(1.02); }
-    .drop-zone-filled { border: 3px solid #22c55e; background-color: #dcfce7; }
-    .dragging { opacity: 0.5; transform: scale(1.1) rotate(5deg); }
-    .draggable-item { cursor: grab; user-select: none; touch-action: none; }
-    .draggable-item:active { cursor: grabbing; }
+    .drop-zone {
+      border: 3px dashed #94a3b8;
+      background-color: #f8fafc;
+      transition: all .3s ease;
+      border-radius: 1rem;
+      min-height: 60px;
+    }
+
+    .drop-zone.drag-over {
+      border-color: #3b82f6;
+      background-color: #dbeafe;
+      transform: scale(1.02);
+    }
+
+    .drop-zone-filled {
+      border: 3px solid #22c55e;
+      background-color: #dcfce7;
+    }
+
+    .dragging {
+      opacity: 0.5;
+      transform: scale(1.1) rotate(5deg);
+    }
+
+    .draggable-item {
+      cursor: grab;
+      user-select: none;
+      touch-action: none;
+    }
+
+    .draggable-item:active {
+      cursor: grabbing;
+    }
 
     /* Aktiviti 1: Tatasusunan */
     .grid-cell {
-      width: 40px; height: 40px;
-      border: 2px solid #cbd5e1; background-color: #f1f5f9;
-      cursor: pointer; border-radius: 6px; transition: all 0.2s;
+      width: 40px;
+      height: 40px;
+      border: 2px solid #cbd5e1;
+      background-color: #f1f5f9;
+      cursor: pointer;
+      border-radius: 6px;
+      transition: all 0.2s;
     }
-    .grid-cell:hover { background-color: #e2e8f0; transform: scale(1.1); }
-    .grid-cell.active { background-color: #3b82f6; border-color: #1d4ed8; box-shadow: 0 0 8px rgba(59, 130, 246, 0.5); }
+
+    .grid-cell:hover {
+      background-color: #e2e8f0;
+      transform: scale(1.1);
+    }
+
+    .grid-cell.active {
+      background-color: #3b82f6;
+      border-color: #1d4ed8;
+      box-shadow: 0 0 8px rgba(59, 130, 246, 0.5);
+    }
 
     /* Aktiviti 2: Guli */
     .guli-source {
-      width: 70px; height: 70px;
+      width: 70px;
+      height: 70px;
       background: radial-gradient(circle at 30% 30%, #38bdf8, #0284c7);
-      border-radius: 50%; display: flex; align-items: center; justify-content: center;
-      font-size: 2rem; cursor: grab; box-shadow: 0 4px 6px rgba(0,0,0,0.2); transition: transform 0.2s;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2rem;
+      cursor: grab;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+      transition: transform 0.2s;
     }
-    .guli-source:active { transform: scale(0.9); cursor: grabbing; }
-    .bekas-guli {
-      min-width: 100px; min-height: 100px;
-      display: flex; flex-wrap: wrap; gap: 5px; align-content: flex-start; padding: 10px;
-    }
-    .mini-guli {
-      width: 20px; height: 20px;
-      background: radial-gradient(circle at 30% 30%, #38bdf8, #0284c7);
-      border-radius: 50%; animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    }
-    @keyframes popIn { 0% { transform: scale(0); } 100% { transform: scale(1); } }
 
+    .guli-source:active {
+      transform: scale(0.9);
+      cursor: grabbing;
+    }
+
+    .bekas-guli {
+      min-width: 100px;
+      min-height: 100px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+      align-content: flex-start;
+      padding: 10px;
+    }
+
+    .mini-guli {
+      width: 20px;
+      height: 20px;
+      background: radial-gradient(circle at 30% 30%, #38bdf8, #0284c7);
+      border-radius: 50%;
+      animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    @keyframes popIn {
+      0% {
+        transform: scale(0);
+      }
+
+      100% {
+        transform: scale(1);
+      }
+    }
   </style>
 </head>
-<body class="min-h-screen text-slate-800 pb-10">
 
-  <div class="fixed top-4 left-0 right-0 z-50 px-4 pointer-events-none">
-    <div class="max-w-4xl mx-auto bg-green-400 border-4 border-green-600 rounded-full px-6 py-3 shadow-xl flex items-center justify-between pointer-events-auto transform hover:scale-[1.01] transition-transform">
+<body class="h-screen w-screen overflow-hidden text-slate-800 flex flex-col overscroll-none">
+
+  <div class="flex-none p-4 z-50 pointer-events-none w-full">
+    <div
+      class="max-w-4xl mx-auto bg-green-400 border-4 border-green-600 rounded-full px-4 py-2 shadow-xl flex items-center justify-between pointer-events-auto transform hover:scale-[1.01] transition-transform">
       <div class="flex items-center gap-3">
-        <span class="text-3xl animate-bounce">✖️</span>
-        <span id="info-text" class="text-xl font-bold text-green-900 leading-none mt-1">Operasi Darab & Bahagi</span>
+        <span class="text-2xl animate-bounce">✖️</span>
+        <span id="info-text" class="text-lg font-bold text-green-900 leading-none mt-1">Operasi Darab & Bahagi</span>
       </div>
-      <button id="speak-btn" onclick="speakInfo()" class="bg-white hover:bg-green-50 text-green-600 border-2 border-green-200 rounded-full p-2 transition-colors shadow-sm">🔊</button>
+      <button id="speak-btn" onclick="speakInfo()"
+        class="bg-white hover:bg-green-50 text-green-600 border-2 border-green-200 rounded-full p-2 transition-colors shadow-sm">🔊</button>
     </div>
   </div>
-  <div class="h-24"></div>
+  <div class="h-4"></div>
 
-  <div class="max-w-6xl mx-auto p-4">
-    
-    <div class="game-card p-8 mb-8">
-        <div id="activity-content" class="w-full relative z-10">
-            <div class="py-10 text-center">
-                <div class="text-8xl mb-6 animate-pulse">➗</div>
-                <h2 class="text-5xl font-bold text-emerald-600 mb-4">Darab & Bahagi</h2>
-                <p class="text-2xl text-slate-500 mb-8 font-semibold">Konsep visual untuk pemahaman mudah.</p>
-                <div class="text-4xl animate-bounce">👇</div>
-            </div>
+  <div class="flex-1 w-full max-w-5xl mx-auto p-2 flex flex-col min-h-0">
+    <div class="game-card p-4 mb-2 flex-1 w-full">
+      <div id="activity-content" class="w-full h-full relative z-10 flex flex-col overflow-hidden">
+        <div class="py-10 text-center flex flex-col justify-center h-full">
+          <div class="text-6xl mb-4 animate-pulse">➗</div>
+          <h2 class="text-3xl font-bold text-emerald-600 mb-2">Darab & Bahagi</h2>
+          <p class="text-lg text-slate-500 mb-4 font-semibold">Konsep visual untuk pemahaman mudah.</p>
+          <div class="text-2xl animate-bounce">👇</div>
         </div>
+      </div>
     </div>
 
-    <div class="bg-white/80 backdrop-blur-sm rounded-3xl shadow-lg p-6 border-2 border-white">
-      <h3 class="text-2xl font-bold text-slate-700 mb-4 text-center">🎮 Pilih Aktiviti</h3>
-      
-      <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4 mb-8">
-        <button onclick="loadActivity(1)" class="btn-3d bg-blue-500 text-white font-bold py-4 px-2 rounded-xl text-lg">🟦 Tatasusunan</button>
-        <button onclick="loadActivity(2)" class="btn-3d bg-emerald-500 text-white font-bold py-4 px-2 rounded-xl text-lg">🥎 Bekas & Guli</button>
-        <button onclick="loadActivity(3)" class="btn-3d bg-violet-500 text-white font-bold py-4 px-2 rounded-xl text-lg">⚙️ Penjana Sifir</button>
-        <button onclick="loadActivity(4)" class="btn-3d bg-orange-500 text-white font-bold py-4 px-2 rounded-xl text-lg">➰ Tali Sifir</button>
-        <button onclick="loadActivity(5)" class="btn-3d bg-rose-500 text-white font-bold py-4 px-2 rounded-xl text-lg">🧩 Padanan</button>
+    <div class="flex-none bg-white/80 backdrop-blur-sm rounded-3xl shadow-lg p-2 border-2 border-white">
+      <h3 class="text-lg font-bold text-slate-700 mb-2 text-center">🎮 Pilih Aktiviti</h3>
+      <div class="grid grid-cols-5 gap-2 mb-2">
+        <button onclick="loadActivity(1)"
+          class="btn-3d bg-blue-500 text-white font-bold py-2 px-1 rounded-xl text-xs">🟦<br>Array</button>
+        <button onclick="loadActivity(2)"
+          class="btn-3d bg-emerald-500 text-white font-bold py-2 px-1 rounded-xl text-xs">🥎<br>Guli</button>
+        <button onclick="loadActivity(3)"
+          class="btn-3d bg-violet-500 text-white font-bold py-2 px-1 rounded-xl text-xs">⚙️<br>Sifir</button>
+        <button onclick="loadActivity(4)"
+          class="btn-3d bg-orange-500 text-white font-bold py-2 px-1 rounded-xl text-xs">➰<br>Tali</button>
+        <button onclick="loadActivity(5)"
+          class="btn-3d bg-rose-500 text-white font-bold py-2 px-1 rounded-xl text-xs">🧩<br>Match</button>
       </div>
-
-      <div class="flex justify-center gap-4 border-t-2 border-slate-100 pt-6">
-        <button onclick="clearActivity()" class="btn-3d bg-slate-400 text-white font-bold py-2 px-6 rounded-full text-lg">🏠 Menu</button>
-        <button onclick="nextActivity()" class="btn-3d bg-indigo-500 text-white font-bold py-2 px-8 rounded-full text-xl">Seterusnya ➡️</button>
+      <div class="flex justify-center gap-4 border-t-2 border-slate-100 pt-2">
+        <button onclick="clearActivity()"
+          class="btn-3d bg-slate-400 text-white font-bold py-1 px-4 rounded-full text-sm">🏠 Menu</button>
+        <button onclick="nextActivity()"
+          class="btn-3d bg-indigo-500 text-white font-bold py-1 px-6 rounded-full text-base">Seterusnya ➡️</button>
       </div>
     </div>
   </div>
@@ -139,44 +247,44 @@
 
     function triggerWin() { confetti({ particleCount: 150, spread: 80, origin: { y: 0.6 } }); }
 
-    function speak(text) { 
-        if (!ttsEnabled || !('speechSynthesis' in window)) return; 
-        window.speechSynthesis.cancel(); 
-        const u = new SpeechSynthesisUtterance(text); 
-        u.lang = 'ms-MY'; u.rate = 0.9; u.pitch = 1.1; 
-        const voices = window.speechSynthesis.getVoices(); 
-        const ms = voices.find(v => v.lang === 'ms-MY' || v.lang?.startsWith('ms')); 
-        if (ms) u.voice = ms; 
-        window.speechSynthesis.speak(u); 
+    function speak(text) {
+      if (!ttsEnabled || !('speechSynthesis' in window)) return;
+      window.speechSynthesis.cancel();
+      const u = new SpeechSynthesisUtterance(text);
+      u.lang = 'ms-MY'; u.rate = 0.9; u.pitch = 1.1;
+      const voices = window.speechSynthesis.getVoices();
+      const ms = voices.find(v => v.lang === 'ms-MY' || v.lang?.startsWith('ms'));
+      if (ms) u.voice = ms;
+      window.speechSynthesis.speak(u);
     }
-    
-    function setInfo(text) { 
-        currentInfo = text; 
-        const infoEl = document.getElementById('info-text'); 
-        infoEl.style.opacity = 0; 
-        setTimeout(() => { infoEl.textContent = text; infoEl.style.opacity = 1; }, 200); 
+
+    function setInfo(text) {
+      currentInfo = text;
+      const infoEl = document.getElementById('info-text');
+      infoEl.style.opacity = 0;
+      setTimeout(() => { infoEl.textContent = text; infoEl.style.opacity = 1; }, 200);
     }
-    
-    function speakInfo() { 
-        if (!ttsEnabled) { 
-            ttsEnabled = true; 
-            document.getElementById('speak-btn').classList.add('bg-green-100', 'text-green-600'); 
-        } 
-        speak(currentInfo); 
+
+    function speakInfo() {
+      if (!ttsEnabled) {
+        ttsEnabled = true;
+        document.getElementById('speak-btn').classList.add('bg-green-100', 'text-green-600');
+      }
+      speak(currentInfo);
     }
 
     /* --- DRAG & DROP LOGIC --- */
-    window.dragStart = function(e) { draggedElement = e.target; e.target.classList.add('dragging'); }
-    window.dragEnd = function(e) { 
-        if(draggedElement) draggedElement.classList.remove('dragging'); 
-        document.querySelectorAll('.drop-zone').forEach(z=>z.classList.remove('drag-over')); 
+    window.dragStart = function (e) { draggedElement = e.target; e.target.classList.add('dragging'); }
+    window.dragEnd = function (e) {
+      if (draggedElement) draggedElement.classList.remove('dragging');
+      document.querySelectorAll('.drop-zone').forEach(z => z.classList.remove('drag-over'));
     }
-    window.allowDrop = function(e) { 
-        e.preventDefault(); 
-        if (e.currentTarget.classList.contains('drop-zone')) e.currentTarget.classList.add('drag-over'); 
+    window.allowDrop = function (e) {
+      e.preventDefault();
+      if (e.currentTarget.classList.contains('drop-zone')) e.currentTarget.classList.add('drag-over');
     }
-    window.dragLeave = function(e) { 
-        if (e.currentTarget.classList.contains('drop-zone')) e.currentTarget.classList.remove('drag-over'); 
+    window.dragLeave = function (e) {
+      if (e.currentTarget.classList.contains('drop-zone')) e.currentTarget.classList.remove('drag-over');
     }
 
     /* --- ROUTER --- */
@@ -185,19 +293,19 @@
       const content = document.getElementById('activity-content');
       content.style.opacity = 0;
       setTimeout(() => {
-          if (n === 1) loadArrayActivity(content);
-          if (n === 2) loadContainerActivity(content);
-          if (n === 3) loadGeneratorActivity(content);
-          if (n === 4) loadSifirBuilder(content);
-          if (n === 5) loadMatchingActivity(content);
-          content.style.opacity = 1;
+        if (n === 1) loadArrayActivity(content);
+        if (n === 2) loadContainerActivity(content);
+        if (n === 3) loadGeneratorActivity(content);
+        if (n === 4) loadSifirBuilder(content);
+        if (n === 5) loadMatchingActivity(content);
+        content.style.opacity = 1;
       }, 200);
     }
 
     function clearActivity() {
-        currentActivity = 0;
-        document.getElementById('activity-content').innerHTML = `<div class="py-10 text-center"><div class="text-8xl mb-6 animate-pulse">➗</div><h2 class="text-5xl font-bold text-emerald-600 mb-4">Darab & Bahagi</h2><p class="text-2xl text-slate-500 mb-8 font-semibold">Pilih aktiviti di bawah.</p></div>`;
-        setInfo("Pilih aktiviti untuk mula belajar!");
+      currentActivity = 0;
+      document.getElementById('activity-content').innerHTML = `<div class="py-10 text-center flex flex-col justify-center h-full"><div class="text-6xl mb-4 animate-pulse">➗</div><h2 class="text-3xl font-bold text-emerald-600 mb-2">Darab & Bahagi</h2><p class="text-lg text-slate-500 mb-4 font-semibold">Pilih aktiviti di bawah.</p></div>`;
+      setInfo("Pilih aktiviti untuk mula belajar!");
     }
     function nextActivity() { let next = currentActivity + 1; if (next > 5) next = 1; loadActivity(next); }
 
@@ -214,28 +322,30 @@
       for (let r = 1; r <= rows; r++) {
         gridHtml += `<div class="flex justify-center gap-1 mb-1">`;
         for (let c = 1; c <= cols; c++) {
-          gridHtml += `<div class="grid-cell" data-row="${r}" data-col="${c}" onclick="buildArray(this, ${r}, ${c})"></div>`;
+          gridHtml += `<div class="grid-cell w-8 h-8 md:w-10 md:h-10 border-2 rounded-md" data-row="${r}" data-col="${c}" onclick="buildArray(this, ${r}, ${c})"></div>`;
         }
         gridHtml += `</div>`;
       }
 
       content.innerHTML = `
-        <h3 class="text-4xl font-bold text-blue-500 mb-6 text-center">1. Bina Tatasusunan</h3>
-        <div class="bg-blue-50 rounded-3xl p-8 border-4 border-blue-200 max-w-2xl mx-auto">
-            <div class="mb-6 text-center">
-              <div id="array-grid" class="inline-block p-4 bg-white rounded-xl border-2 border-blue-100 shadow-sm">${gridHtml}</div>
-            </div>
-            <div id="array-result" class="text-center text-2xl font-bold text-blue-700 min-h-[60px] bg-white p-4 rounded-xl border-2 border-blue-100">
-              Klik mana-mana petak untuk mula.
-            </div>
-            <div class="text-center mt-6">
-                <button onclick="loadActivity(1)" class="btn-3d bg-blue-500 text-white font-bold py-2 px-6 rounded-xl">🔄 Mula Semula</button>
+        <h3 class="text-xl font-bold text-blue-500 mb-2 text-center flex-none">1. Bina Tatasusunan</h3>
+        <div class="flex-1 w-full overflow-y-auto px-4 flex flex-col items-center">
+            <div class="bg-blue-50 rounded-3xl p-4 border-4 border-blue-200 max-w-lg mx-auto w-full flex-none">
+                <div class="mb-4 text-center">
+                  <div id="array-grid" class="inline-block p-2 bg-white rounded-xl border-2 border-blue-100 shadow-sm">${gridHtml}</div>
+                </div>
+                <div id="array-result" class="text-center text-xl font-bold text-blue-700 min-h-[40px] bg-white p-2 rounded-xl border-2 border-blue-100 mb-4">
+                  Klik mana-mana petak untuk mula.
+                </div>
+                <div class="text-center">
+                    <button onclick="loadActivity(1)" class="btn-3d bg-blue-500 text-white font-bold py-2 px-4 rounded-xl text-sm">🔄 Mula Semula</button>
+                </div>
             </div>
         </div>
       `;
     }
 
-    window.buildArray = function(cell, r, c) {
+    window.buildArray = function (cell, r, c) {
       const cells = document.querySelectorAll('#array-grid .grid-cell');
       cells.forEach(c => c.classList.remove('active'));
       for (let i = 1; i <= r; i++) {
@@ -252,35 +362,36 @@
     function loadContainerActivity(content) {
       setInfo("Seret guli ke dalam bekas. Setiap bekas perlu 4 biji.");
       content.innerHTML = `
-        <h3 class="text-4xl font-bold text-emerald-500 mb-6 text-center">2. Bekas & Guli</h3>
-        <div class="bg-emerald-50 rounded-3xl p-8 border-4 border-emerald-200">
-            <div class="flex flex-col md:flex-row items-center justify-around gap-8 mb-8">
-              <div class="text-center bg-white p-6 rounded-2xl border-2 border-emerald-100 shadow-sm">
-                <h4 class="text-lg font-bold text-slate-400 uppercase mb-4">Sumber Guli</h4>
-                <div class="guli-source mx-auto draggable-item" draggable="true" ondragstart="dragStart(event)" ondragend="dragEnd(event)">🥎</div>
-                <p class="text-xs text-slate-400 mt-2">(Seret saya!)</p>
-              </div>
-              <div class="text-center flex-grow">
-                <h4 class="text-lg font-bold text-slate-400 uppercase mb-4">Isi 4 Guli Setiap Bekas</h4>
-                <div class="flex flex-wrap justify-center gap-4">
-                  <div class="bekas-guli drop-zone rounded-2xl bg-white" ondrop="dropOnBekas(event, 3, 4)" ondragover="allowDrop(event)" ondragleave="dragLeave(event)" data-count="0" data-target="4"></div>
-                  <div class="bekas-guli drop-zone rounded-2xl bg-white" ondrop="dropOnBekas(event, 3, 4)" ondragover="allowDrop(event)" ondragleave="dragLeave(event)" data-count="0" data-target="4"></div>
-                  <div class="bekas-guli drop-zone rounded-2xl bg-white" ondrop="dropOnBekas(event, 3, 4)" ondragover="allowDrop(event)" ondragleave="dragLeave(event)" data-count="0" data-target="4"></div>
+        <h3 class="text-xl font-bold text-emerald-500 mb-2 text-center flex-none">2. Bekas & Guli</h3>
+        <div class="flex-1 w-full overflow-y-auto px-4 flex flex-col items-center">
+            <div class="bg-emerald-50 rounded-3xl p-4 border-4 border-emerald-200 w-full max-w-2xl flex-none">
+                <div class="flex flex-col md:flex-row items-center justify-around gap-4 mb-4">
+                  <div class="text-center bg-white p-2 rounded-2xl border-2 border-emerald-100 shadow-sm">
+                    <h4 class="text-xs font-bold text-slate-400 uppercase mb-2">Sumber</h4>
+                    <div class="guli-source mx-auto draggable-item w-12 h-12 text-xl" draggable="true" ondragstart="dragStart(event)" ondragend="dragEnd(event)">🥎</div>
+                  </div>
+                  <div class="text-center flex-grow">
+                    <h4 class="text-xs font-bold text-slate-400 uppercase mb-2">Isi 4 Guli</h4>
+                    <div class="flex flex-wrap justify-center gap-2">
+                      <div class="bekas-guli drop-zone rounded-xl bg-white w-20 h-20 min-w-[80px] p-1" ondrop="dropOnBekas(event, 3, 4)" ondragover="allowDrop(event)" ondragleave="dragLeave(event)" data-count="0" data-target="4"></div>
+                      <div class="bekas-guli drop-zone rounded-xl bg-white w-20 h-20 min-w-[80px] p-1" ondrop="dropOnBekas(event, 3, 4)" ondragover="allowDrop(event)" ondragleave="dragLeave(event)" data-count="0" data-target="4"></div>
+                      <div class="bekas-guli drop-zone rounded-xl bg-white w-20 h-20 min-w-[80px] p-1" ondrop="dropOnBekas(event, 3, 4)" ondragover="allowDrop(event)" ondragleave="dragLeave(event)" data-count="0" data-target="4"></div>
+                    </div>
+                  </div>
                 </div>
-              </div>
-            </div>
-            <div id="bekas-result" class="text-center text-xl font-bold text-emerald-700 bg-white p-4 rounded-xl border-2 border-emerald-100">
-              Ada 3 bekas. Kita nak isi 4 guli dalam setiap satu.
+                <div id="bekas-result" class="text-center text-sm font-bold text-emerald-700 bg-white p-2 rounded-xl border-2 border-emerald-100">
+                  Isi 4 guli dalam setiap bekas.
+                </div>
             </div>
         </div>
       `;
     }
 
-    window.dropOnBekas = function(e, totalBekas, targetPerBekas) {
+    window.dropOnBekas = function (e, totalBekas, targetPerBekas) {
       e.preventDefault(); e.currentTarget.classList.remove('drag-over'); if (!draggedElement) return;
       let count = parseInt(e.currentTarget.dataset.count);
       const target = parseInt(e.currentTarget.dataset.target);
-      
+
       if (count < target) {
         count++;
         e.currentTarget.dataset.count = count;
@@ -293,7 +404,7 @@
         const allBekas = document.querySelectorAll('.bekas-guli');
         let filledBekas = 0;
         allBekas.forEach(b => { if (parseInt(b.dataset.count) === target) filledBekas++; });
-        
+
         if (filledBekas === totalBekas) {
           const totalGuli = totalBekas * targetPerBekas;
           const msgSiap = `Tahniah! ${totalBekas} bekas x ${targetPerBekas} guli = ${totalGuli} guli semuanya!`;
@@ -302,7 +413,7 @@
         }
       } else {
         setInfo("Bekas ini dah penuh!"); speak("Penuh!");
-        e.currentTarget.classList.add('shake'); setTimeout(()=>e.currentTarget.classList.remove('shake'), 500);
+        e.currentTarget.classList.add('shake'); setTimeout(() => e.currentTarget.classList.remove('shake'), 500);
       }
     }
 
@@ -310,24 +421,26 @@
     function loadGeneratorActivity(content) {
       setInfo("Pilih nombor dan tekan Jana.");
       content.innerHTML = `
-        <h3 class="text-4xl font-bold text-violet-500 mb-6 text-center">3. Penjana Sifir</h3>
-        <div class="bg-violet-50 rounded-3xl p-8 border-4 border-violet-200 max-w-2xl mx-auto text-center">
-            <div class="flex flex-wrap justify-center items-end gap-4 mb-8">
-              <div class="text-left"><label class="block font-bold text-violet-700 text-sm mb-1">Kumpulan</label>
-                  <select id="select-kumpulan" class="p-3 border-2 border-violet-300 rounded-xl text-2xl font-bold text-violet-600 bg-white outline-none"><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option></select></div>
-              <div class="text-4xl font-black text-violet-300 pb-2">×</div>
-              <div class="text-left"><label class="block font-bold text-violet-700 text-sm mb-1">Ahli</label>
-                  <select id="select-ahli" class="p-3 border-2 border-violet-300 rounded-xl text-2xl font-bold text-violet-600 bg-white outline-none"><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option></select></div>
-              <button onclick="janaSifir()" class="btn-3d bg-violet-500 text-white font-bold py-3 px-6 rounded-xl text-lg ml-2">🚀 Jana</button>
-            </div>
-            <div id="visual-result" class="p-6 bg-white rounded-2xl min-h-[150px] border-2 border-violet-100">
-              <p class="text-slate-400 font-bold">Visual akan muncul di sini.</p>
+        <h3 class="text-xl font-bold text-violet-500 mb-2 text-center flex-none">3. Penjana Sifir</h3>
+        <div class="flex-1 w-full overflow-y-auto px-4 flex flex-col items-center">
+            <div class="bg-violet-50 rounded-3xl p-4 border-4 border-violet-200 max-w-lg mx-auto text-center flex-none w-full">
+                <div class="flex flex-wrap justify-center items-end gap-2 mb-4">
+                  <div class="text-left"><label class="block font-bold text-violet-700 text-xs mb-1">Kumpulan</label>
+                      <select id="select-kumpulan" class="p-2 border-2 border-violet-300 rounded-lg text-lg font-bold text-violet-600 bg-white outline-none"><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option></select></div>
+                  <div class="text-2xl font-black text-violet-300 pb-1">×</div>
+                  <div class="text-left"><label class="block font-bold text-violet-700 text-xs mb-1">Ahli</label>
+                      <select id="select-ahli" class="p-2 border-2 border-violet-300 rounded-lg text-lg font-bold text-violet-600 bg-white outline-none"><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option></select></div>
+                  <button onclick="janaSifir()" class="btn-3d bg-violet-500 text-white font-bold py-2 px-4 rounded-xl text-md ml-1">🚀 Jana</button>
+                </div>
+                <div id="visual-result" class="p-4 bg-white rounded-2xl min-h-[100px] border-2 border-violet-100">
+                  <p class="text-slate-400 font-bold text-sm">Visual akan muncul di sini.</p>
+                </div>
             </div>
         </div>
       `;
     }
 
-    window.janaSifir = function() {
+    window.janaSifir = function () {
       const k = parseInt(document.getElementById('select-kumpulan').value);
       const a = parseInt(document.getElementById('select-ahli').value);
       let visualHtml = `<div class="flex flex-wrap justify-center gap-4">`;
@@ -347,30 +460,32 @@
     function loadSifirBuilder(content) {
       setInfo("Tekan butang Tambah untuk lihat gandaan sifir 3.");
       content.innerHTML = `
-        <h3 class="text-4xl font-bold text-orange-500 mb-6 text-center">4. Tali Sifir (Sifir 3)</h3>
-        <div class="bg-orange-50 rounded-3xl p-8 border-4 border-orange-200 max-w-3xl mx-auto">
-            <div class="text-center mb-8">
-              <button onclick="addSifir(3)" class="btn-3d bg-orange-500 text-white font-bold py-4 px-8 rounded-2xl text-2xl shadow-lg">+ Tambah 3 👕</button>
+        <h3 class="text-xl font-bold text-orange-500 mb-2 text-center flex-none">4. Tali Sifir (Sifir 3)</h3>
+        <div class="flex-1 w-full overflow-y-auto px-4 flex flex-col items-center">
+            <div class="bg-orange-50 rounded-3xl p-4 border-4 border-orange-200 max-w-2xl mx-auto w-full flex-none">
+                <div class="text-center mb-4">
+                  <button onclick="addSifir(3)" class="btn-3d bg-orange-500 text-white font-bold py-2 px-6 rounded-xl text-lg shadow-lg">+ Tambah 3 👕</button>
+                </div>
+                <div id="tali-sifir-line" class="flex flex-wrap justify-start gap-1 p-2 bg-white rounded-2xl min-h-[80px] border-2 border-orange-100 shadow-inner"></div>
+                <div class="mt-4 text-center">
+                   <div class="inline-block bg-orange-100 text-orange-800 px-4 py-2 rounded-xl text-2xl font-black border-2 border-orange-300">Jumlah: <span id="sifir-total">0</span></div>
+                </div>
+                <div class="text-center mt-2"><button onclick="loadSifirBuilder(document.getElementById('activity-content'))" class="text-slate-400 font-bold text-xs hover:text-orange-500 underline">Mula Semula</button></div>
             </div>
-            <div id="tali-sifir-line" class="flex flex-wrap justify-start gap-2 p-6 bg-white rounded-2xl min-h-[120px] border-2 border-orange-100 shadow-inner"></div>
-            <div class="mt-6 text-center">
-               <div class="inline-block bg-orange-100 text-orange-800 px-6 py-3 rounded-xl text-3xl font-black border-2 border-orange-300">Jumlah: <span id="sifir-total">0</span></div>
-            </div>
-            <div class="text-center mt-4"><button onclick="loadSifirBuilder(document.getElementById('activity-content'))" class="text-slate-400 font-bold text-sm hover:text-orange-500 underline">Mula Semula</button></div>
         </div>
       `;
     }
 
-    window.addSifir = function(num) {
+    window.addSifir = function (num) {
       const tali = document.getElementById('tali-sifir-line');
       const totalEl = document.getElementById('sifir-total');
       const currentTotal = parseInt(totalEl.textContent);
       if (currentTotal >= 30) { setInfo("Dah sampai 30! Tahniah."); speak("Dah sampai 30."); triggerWin(); return; }
-      
+
       let groupHtml = `<div class="bg-orange-100 border border-orange-300 rounded-lg px-2 py-1 animate-[popIn_0.3s_ease] flex items-center">`;
       for (let i = 0; i < num; i++) groupHtml += `<span class="text-3xl">👕</span>`;
       groupHtml += `<span class="ml-1 text-xs font-bold text-orange-400">${currentTotal + num}</span></div>`;
-      
+
       tali.innerHTML += groupHtml;
       const newTotal = currentTotal + num;
       totalEl.textContent = newTotal;
@@ -385,50 +500,53 @@
         { eq: "3 x 2", visual: "⭐⭐<br>⭐⭐<br>⭐⭐", count: 6 },
         { eq: "4 x 1", visual: "🚀<br>🚀<br>🚀<br>🚀", count: 4 }
       ];
-      
+
       content.innerHTML = `
-        <h3 class="text-4xl font-bold text-rose-500 mb-6 text-center">5. Padanan Visual</h3>
-        <div class="flex flex-col md:flex-row gap-8 justify-center max-w-4xl mx-auto">
-          <div class="md:w-1/3 bg-white p-6 rounded-3xl border-4 border-rose-100 shadow-sm">
-            <h4 class="text-center font-bold text-slate-400 mb-4 uppercase tracking-wider">Ayat Matematik</h4>
-            <div id="match-source" class="flex flex-col gap-4">
-              ${items.sort(()=>Math.random()-0.5).map(item => `
-                <div class="btn-3d bg-rose-500 text-white border-rose-700 rounded-xl p-4 text-2xl font-bold text-center draggable-item"
-                     draggable="true" ondragstart="dragStart(event)" ondragend="dragEnd(event)" data-answer="${item.eq}">${item.eq}</div>`).join('')}
+        <h3 class="text-xl font-bold text-rose-500 mb-2 text-center flex-none">5. Padanan Visual</h3>
+        <div class="flex-1 w-full overflow-y-auto px-4 flex flex-col items-center">
+            <div class="flex flex-col md:flex-row gap-4 justify-center max-w-4xl mx-auto w-full flex-none">
+              <div class="md:w-1/3 bg-white p-4 rounded-3xl border-4 border-rose-100 shadow-sm order-2 md:order-1">
+                <h4 class="text-center font-bold text-slate-400 mb-2 text-xs uppercase tracking-wider">Ayat Matematik</h4>
+                <div id="match-source" class="flex flex-row md:flex-col flex-wrap justify-center gap-2">
+                  ${items.sort(() => Math.random() - 0.5).map(item => `
+                    <div class="btn-3d bg-rose-500 text-white border-rose-700 rounded-lg p-2 text-lg font-bold text-center draggable-item"
+                         draggable="true" ondragstart="dragStart(event)" ondragend="dragEnd(event)" data-answer="${item.eq}">${item.eq}</div>`).join('')}
+                </div>
+              </div>
+              <div class="md:w-2/3 bg-rose-50 p-4 rounded-3xl border-4 border-rose-200 order-1 md:order-2">
+                <h4 class="text-center font-bold text-slate-400 mb-2 text-xs uppercase tracking-wider">Padankan Gambar</h4>
+                <div id="match-target" class="flex flex-col gap-2">
+                  ${items.sort(() => Math.random() - 0.5).map(item => `
+                    <div class="drop-zone rounded-xl p-2 bg-white flex items-center justify-between"
+                         ondrop="dropOnMatch(event)" ondragover="allowDrop(event)" ondragleave="dragLeave(event)" data-correct="${item.eq}">
+                      <div class="text-lg leading-none text-center w-1/2">${item.visual}</div>
+                      <div class="text-2xl font-black text-slate-200 w-1/2 text-center">?</div>
+                    </div>`).join('')}
+                </div>
+              </div>
             </div>
-          </div>
-          <div class="md:w-2/3 bg-rose-50 p-6 rounded-3xl border-4 border-rose-200">
-            <h4 class="text-center font-bold text-slate-400 mb-4 uppercase tracking-wider">Padankan Gambar</h4>
-            <div id="match-target" class="flex flex-col gap-4">
-              ${items.sort(()=>Math.random()-0.5).map(item => `
-                <div class="drop-zone rounded-2xl p-4 bg-white flex items-center justify-between"
-                     ondrop="dropOnMatch(event)" ondragover="allowDrop(event)" ondragleave="dragLeave(event)" data-correct="${item.eq}">
-                  <div class="text-2xl leading-none text-center w-1/2">${item.visual}</div>
-                  <div class="text-3xl font-black text-slate-200 w-1/2 text-center">?</div>
-                </div>`).join('')}
-            </div>
-          </div>
         </div>
       `;
     }
 
-    window.dropOnMatch = function(e) {
+    window.dropOnMatch = function (e) {
       e.preventDefault(); e.currentTarget.classList.remove('drag-over'); if (!draggedElement) return;
       const draggedAnswer = draggedElement.dataset.answer;
       const correctNumber = e.currentTarget.dataset.correct;
-      
+
       if (draggedAnswer === correctNumber) {
-        const total = draggedAnswer.split('x').reduce((a,b) => parseInt(a)*parseInt(b));
+        const total = draggedAnswer.split('x').reduce((a, b) => parseInt(a) * parseInt(b));
         e.currentTarget.innerHTML = `<div class="text-green-600 text-2xl font-bold flex-grow text-center">Betul! <br> ${draggedAnswer} = ${total}</div><div class="text-4xl">✅</div>`;
         e.currentTarget.classList.add('drop-zone-filled'); e.currentTarget.classList.remove('drop-zone');
         draggedElement.remove(); draggedElement = null; speak("Betul!");
         if (document.querySelectorAll('#match-source .draggable-item').length === 0) { setInfo("Syabas! Semua betul!"); speak("Syabas! Semua betul!"); triggerWin(); }
       } else {
         setInfo("Salah tu. Cuba lagi."); speak("Cuba lagi.");
-        e.currentTarget.classList.add('shake'); setTimeout(()=>e.currentTarget.classList.remove('shake'), 500);
+        e.currentTarget.classList.add('shake'); setTimeout(() => e.currentTarget.classList.remove('shake'), 500);
       }
     }
 
   </script>
 </body>
+
 </html>
